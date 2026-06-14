@@ -1,220 +1,257 @@
 --[[
-    8ilp HUB v7.0
-    نفس هيكلة kaml
+    8ilp HUB
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/8ilp/8ilp-hub/main/8ilp.lua"))()
 --]]
 
-local Services = {
-    Players = game:GetService("Players"),
-    Workspace = game:GetService("Workspace"),
-    ReplicatedStorage = game:GetService("ReplicatedStorage"),
-    UserInputService = game:GetService("UserInputService"),
-    RunService = game:GetService("RunService"),
-    TweenService = game:GetService("TweenService"),
-    HttpService = game:GetService("HttpService"),
-    TeleportService = game:GetService("TeleportService"),
-    CoreGui = game:GetService("CoreGui"),
-    VirtualInputManager = game:GetService("VirtualInputManager")
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "8ilp HUB",
+    SubTitle = "by 8ilp",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Visuals = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-local Player = Services.Players.LocalPlayer
-local Mouse = Player:GetMouse()
+local Options = Fluent.Options
 
--- GUI Builder
-local function CreateGUI(title)
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Parent = Services.CoreGui
-    ScreenGui.ResetOnSpawn = false
-    
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 500, 0, 360)
-    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -180)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = ScreenGui
-    
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 30)
-    Title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Title.TextColor3 = Color3.fromRGB(255, 50, 50)
-    Title.Text = title or "8ilp HUB"
-    Title.Font = Enum.Font.SciFi
-    Title.TextSize = 18
-    Title.Parent = MainFrame
-    
-    return ScreenGui, MainFrame
+do
+    Fluent:Notify({
+        Title = "8ilp HUB",
+        Content = "Loaded Successfully",
+        Duration = 5
+    })
 end
 
-local function CreateButton(parent, text, y, callback)
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, -10, 0, 35)
-    Button.Position = UDim2.new(0, 5, 0, y)
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.Text = text
-    Button.Font = Enum.Font.SciFi
-    Button.TextSize = 14
-    Button.BorderSizePixel = 0
-    Button.Parent = parent
-    Button.MouseButton1Click:Connect(callback)
-    return Button
-end
+-- Main Tab
+Tabs.Main:AddParagraph({ Title = "8ilp Main Features", Content = "Main scripts and features" })
 
--- ESP
-local function ESP(target, color)
-    local highlight = Instance.new("Highlight")
-    highlight.Parent = target
-    highlight.FillColor = color or Color3.fromRGB(255, 0, 0)
-    highlight.FillTransparency = 0.5
-    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-    highlight.OutlineTransparency = 0
-    return highlight
-end
+Tabs.Main:AddButton({
+    Title = "Infinite Yield",
+    Description = "Admin commands script",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
 
-local function PlayerESP()
-    for _, plr in pairs(Services.Players:GetPlayers()) do
-        if plr ~= Player and plr.Character then
-            ESP(plr.Character, Color3.fromRGB(255, 0, 0))
+Tabs.Main:AddButton({
+    Title = "CMD-X",
+    Description = "Advanced admin commands",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source"))()
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Dark Dex",
+    Description = "Game explorer",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Remote Spy",
+    Description = "View remote events",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpy.lua"))()
+    end
+})
+
+-- Visuals Tab
+Tabs.Visuals:AddParagraph({ Title = "ESP Settings", Content = "Player ESP and visuals" })
+
+local ESPToggle = Tabs.Visuals:AddToggle("MyToggle", { Title = "Player ESP", Default = false })
+ESPToggle:OnChanged(function(state)
+    if state then
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            if plr ~= game.Players.LocalPlayer and plr.Character then
+                local h = Instance.new("Highlight")
+                h.Parent = plr.Character
+                h.FillColor = Color3.fromRGB(255, 0, 0)
+                h.FillTransparency = 0.5
+                h.OutlineColor = Color3.fromRGB(255, 255, 255)
+                h.Name = "8ilp_ESP"
+            end
+        end
+        game.Players.PlayerAdded:Connect(function(plr)
+            plr.CharacterAdded:Connect(function(char)
+                wait(1)
+                local h = Instance.new("Highlight")
+                h.Parent = char
+                h.FillColor = Color3.fromRGB(255, 0, 0)
+                h.FillTransparency = 0.5
+                h.OutlineColor = Color3.fromRGB(255, 255, 255)
+                h.Name = "8ilp_ESP"
+            end)
+        end)
+    else
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            if plr.Character then
+                local esp = plr.Character:FindFirstChild("8ilp_ESP")
+                if esp then esp:Destroy() end
+            end
         end
     end
-    Services.Players.PlayerAdded:Connect(function(plr)
-        plr.CharacterAdded:Connect(function(char)
-            wait(1)
-            ESP(char, Color3.fromRGB(255, 0, 0))
-        end)
-    end)
-end
+end)
 
--- Auto Farm
-local function AutoFarm()
-    task.spawn(function()
-        while task.wait(0.1) do
-            if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-                for _, obj in pairs(Services.Workspace:GetDescendants()) do
-                    if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("HumanoidRootPart") then
-                        local hum = obj.Humanoid
-                        local hrp = obj.HumanoidRootPart
-                        if hum.Health > 0 and (hrp.Position - Player.Character.HumanoidRootPart.Position).Magnitude <= 200 then
-                            Player.Character.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
-                            task.wait(0.3)
-                        end
+Tabs.Visuals:AddToggle("MyToggle2", { Title = "Box ESP", Default = false }):OnChanged(function(state)
+    -- Box ESP placeholder
+end)
+
+Tabs.Visuals:AddToggle("MyToggle3", { Title = "Tracers", Default = false }):OnChanged(function(state)
+    -- Tracers placeholder
+end)
+
+Tabs.Visuals:AddToggle("MyToggle4", { Title = "Chams", Default = false }):OnChanged(function(state)
+    -- Chams placeholder
+end)
+
+-- Player Tab
+Tabs.Player:AddParagraph({ Title = "Movement", Content = "Character modifications" })
+
+local SpeedSlider = Tabs.Player:AddSlider("SpeedSlider", {
+    Title = "Walk Speed",
+    Description = "Change your speed",
+    Default = 16,
+    Min = 16,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(value)
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+        end
+    end
+})
+
+local JumpSlider = Tabs.Player:AddSlider("JumpSlider", {
+    Title = "Jump Power",
+    Description = "Change your jump",
+    Default = 50,
+    Min = 50,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(value)
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+        end
+    end
+})
+
+Tabs.Player:AddToggle("FlyToggle", { Title = "Fly", Default = false }):OnChanged(function(state)
+    if state then
+        local player = game.Players.LocalPlayer
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local bg = Instance.new("BodyGyro")
+            bg.P = 9e4
+            bg.Parent = hrp
+            bg.Name = "8ilp_Fly"
+            local bv = Instance.new("BodyVelocity")
+            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            bv.Parent = hrp
+            bv.Name = "8ilp_Fly"
+            game:GetService("RunService").RenderStepped:Connect(function()
+                if bg and bv and player.Character then
+                    bg.CFrame = workspace.CurrentCamera.CFrame
+                    bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 60
+                end
+            end)
+        end
+    else
+        local player = game.Players.LocalPlayer
+        if player.Character then
+            local bg = player.Character:FindFirstChild("8ilp_Fly", true)
+            local bv = player.Character:FindFirstChild("8ilp_Fly", true)
+            if bg then bg:Destroy() end
+            if bv then bv:Destroy() end
+        end
+    end
+end)
+
+Tabs.Player:AddToggle("NoclipToggle", { Title = "Noclip", Default = false }):OnChanged(function(state)
+    if state then
+        game:GetService("RunService").Stepped:Connect(function()
+            if game.Players.LocalPlayer.Character then
+                for _, v in ipairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
                     end
                 end
             end
-        end
-    end)
-end
-
--- Speed
-local function SpeedHack(speed)
-    if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-        Player.Character.Humanoid.WalkSpeed = speed
+        end)
     end
-end
+end)
 
--- Jump
-local function JumpPower(power)
-    if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-        Player.Character.Humanoid.JumpPower = power
-    end
-end
-
--- Fly
-local function Fly(speed)
-    speed = speed or 50
-    if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then return end
-    local hrp = Player.Character.HumanoidRootPart
-    local bg = Instance.new("BodyGyro")
-    bg.P = 9e4
-    bg.Parent = hrp
-    local bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-    bv.Parent = hrp
-    local conn
-    conn = Services.RunService.RenderStepped:Connect(function()
-        if bg and bv and Player.Character then
-            bg.CFrame = workspace.CurrentCamera.CFrame
-            bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * speed
-        else
-            conn:Disconnect()
-            bg:Destroy()
-            bv:Destroy()
-        end
-    end)
-end
-
--- Noclip
-local function Noclip(state)
-    if not state then return end
-    Services.RunService.Stepped:Connect(function()
-        if Player.Character then
-            for _, v in ipairs(Player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = false
-                end
-            end
-        end
-    end)
-end
-
--- Teleport
-local function Teleport(pos)
-    if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-        Player.Character.HumanoidRootPart.CFrame = typeof(pos) == "Vector3" and CFrame.new(pos) or pos
-    end
-end
-
--- Infinite Jump
-local function InfiniteJump(state)
+Tabs.Player:AddToggle("InfJumpToggle", { Title = "Infinite Jump", Default = false }):OnChanged(function(state)
     if state then
-        Services.UserInputService.JumpRequest:Connect(function()
-            if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-                Player.Character.Humanoid:ChangeState("Jumping")
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
             end
         end)
     end
+end)
+
+-- Teleports Tab
+Tabs.Teleports:AddParagraph({ Title = "Teleport Locations", Content = "Click to teleport" })
+
+local function teleport(pos)
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+    end
 end
 
--- Notification
-local function Notify(text, dur)
-    local gui = Instance.new("ScreenGui")
-    gui.Parent = Services.CoreGui
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 40)
-    frame.Position = UDim2.new(0.5, -150, 0, 10)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    frame.BorderSizePixel = 0
-    frame.Parent = gui
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Text = text
-    label.Font = Enum.Font.SciFi
-    label.TextSize = 14
-    label.Parent = frame
-    task.delay(dur or 3, function() gui:Destroy() end)
-end
+Tabs.Teleports:AddButton({
+    Title = "Spawn",
+    Description = "Teleport to spawn",
+    Callback = function()
+        local spawn = workspace:FindFirstChild("SpawnLocation")
+        if spawn then
+            teleport(spawn.Position)
+        end
+    end
+})
 
--- ============================================
--- 🚀 BUILD HUB
--- ============================================
-local gui, frame = CreateGUI("8ilp HUB")
+Tabs.Teleports:AddButton({
+    Title = "Waypoint",
+    Description = "Teleport to waypoint",
+    Callback = function()
+        -- Waypoint placeholder
+    end
+})
 
-local yPos = 40
-local buttons = {
-    {"ESP", function() PlayerESP() Notify("ESP Activated", 2) end},
-    {"AUTO FARM", function() AutoFarm() Notify("Auto Farm Started", 2) end},
-    {"SPEED [100]", function() SpeedHack(100) Notify("Speed 100", 2) end},
-    {"JUMP [150]", function() JumpPower(150) Notify("Jump 150", 2) end},
-    {"FLY", function() Fly(60) Notify("Fly Activated", 2) end},
-    {"NOCLIP", function() Noclip(true) Notify("Noclip ON", 2) end},
-    {"INF JUMP", function() InfiniteJump(true) Notify("Inf Jump ON", 2) end},
-    {"RESET", function() SpeedHack(16) JumpPower(50) Notify("Reset", 2) end},
-}
+-- Settings Tab
+Tabs.Settings:AddParagraph({ Title = "UI Settings", Content = "Customize your experience" })
 
-for _, btn in pairs(buttons) do
-    CreateButton(frame, btn[1], yPos, btn[2])
-    yPos = yPos + 40
-end
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
 
-Notify("8ilp HUB Loaded!", 3)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("8ilp_HUB")
+SaveManager:SetFolder("8ilp_HUB/config")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "8ilp HUB",
+    Content = "Ready to use!",
+    Duration = 5
+})
